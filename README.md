@@ -1,16 +1,3 @@
-# Jellyfin TUI Build
-
-A terminal user interface (TUI) client for Jellyfin.
-
-## Features
-- Play your Jellyfin media directly from your terminal.
-- Intuitive key bindings for seamless navigation and control.
-- Configurable options for a tailored experience.
-
-Project repository: [dhonus/jellyfin-tui](https://github.com/dhonus/jellyfin-tui)
-
----
-
 ## Installation
 
 ### Prerequisites
@@ -117,8 +104,8 @@ The default configuration file is located at:
 ```yaml
 # must contain protocol and port
 server: 'http://localhost:8096'
-username: 'username'
-password: 'imcool123'
+username: 'jellyfinusername'
+password: 'jellyfinpassword'
 
 persist: false # don't restore session on startup
 art: false # don't show cover image
