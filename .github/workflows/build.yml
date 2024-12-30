@@ -1,0 +1,62 @@
+name: Build Jellyfin TUI
+
+on:
+  schedule:
+    - cron: "0 0 * * 0" # Run at midnight every Sunday (UTC)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v3
+
+      - name: Clone Jellyfin TUI source
+        run: |
+          git clone https://github.com/dhonus/jellyfin-tui.git source
+          cd source
+          git fetch --tags
+
+      - name: Get latest release tag
+        id: get-latest-tag
+        run: |
+          cd source
+          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Checkout the latest release
+        run: |
+          cd source
+          git checkout $LATEST_TAG
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install dependencies for Ubuntu
+        run: sudo apt-get install -y mpv libmpv-dev
+
+      - name: Build the project
+        run: |
+          cd source
+          cargo build --release
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: jellyfin-tui
+          path: source/target/release/
+
+      - name: Create a release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.LATEST_TAG }}
+          release_name: Release ${{ env.LATEST_TAG }}
+          draft: false
+          prerelease: false
